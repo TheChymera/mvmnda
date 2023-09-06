@@ -1,0 +1,5 @@
+pandas
+scipy
+git+https://github.com/INT-NIT/BEP032tools.git@master
+git+https://github.com/SpikeInterface/spikeinterface.git
+
