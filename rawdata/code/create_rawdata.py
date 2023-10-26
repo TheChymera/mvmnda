@@ -106,7 +106,8 @@ class BIDSGenerator(BEP032Data):
 
 if __name__ == '__main__':
     code_path = pathlib.Path(__file__).parent
-    for sub_path in code_path.glob('../sourcedata/sub-*'):
+    for sub_path in code_path.glob('../../sourcedata/sub-*'):
+        print(f'Processing `{sub_path}`')
         sub_id = sub_path.name.split('sub-')[-1]
         for ses_path in sub_path.glob('ses-*'):
             ses_id = ses_path.name.split('ses-')[-1]
