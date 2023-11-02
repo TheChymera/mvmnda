@@ -4,7 +4,8 @@ from pathlib import Path
 from neuroconv.converters import SpikeGLXConverterPipe
 
 #folder_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/sub-pixelfiber/ses-01"
-folder_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/sub-pixelfiber/ses-01/Ach_DualPixel_7_14_23_g0_imec0/Ach_DualPixel_7_14_23_g0_t0.imec0.ap.bin"
+#folder_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/M387-2023-10-20_g0/M387-2023-10-20_g0_imec0/M387-2023-10-20_g0_tcat.imec0.ap.bin"
+folder_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/M387-2023-10-20_g0"
 converter = SpikeGLXConverterPipe(folder_path=folder_path)
 
 # Extract what metadata we can from the source files
