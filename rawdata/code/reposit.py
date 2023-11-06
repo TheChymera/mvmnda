@@ -3,9 +3,9 @@ from dateutil import tz
 from pathlib import Path
 from neuroconv.converters import SpikeGLXConverterPipe
 
-#folder_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/sub-pixelfiber/ses-01"
-#folder_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/M387-2023-10-20_g0/M387-2023-10-20_g0_imec0/M387-2023-10-20_g0_tcat.imec0.ap.bin"
-folder_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/M387-2023-10-20_g0"
+folder_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/sub-pixelfiber/ses-01"
+#folder_path = "../../sourcedata/M387-2023-10-20_g0/M387-2023-10-20_g0_imec0/M387-2023-10-20_g0_tcat.imec0.ap.bin"
+#folder_path = "../../sourcedata/M387-2023-10-20_g0"
 converter = SpikeGLXConverterPipe(folder_path=folder_path)
 
 # Extract what metadata we can from the source files
