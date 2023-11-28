@@ -1,0 +1,5 @@
+outpath_probe0=D:/NPX_Data/M387/M387-2023-10-20_g0/M387-2023-10-20_g0_imec0
+outpath_top=D:/NPX_Data/M387/M387-2023-10-20_g0
+supercat_element={D:/NPX_Data/M387,M387-2023-10-20_g0}
+sync_imec0=D:/NPX_Data/M387/M387-2023-10-20_g0/M387-2023-10-20_g0_imec0/M387-2023-10-20_g0_tcat.imec0.ap.xd_384_6_500.txt
+sync_ni=D:/NPX_Data/M387/M387-2023-10-20_g0/M387-2023-10-20_g0_tcat.nidq.xa_0_500.txt

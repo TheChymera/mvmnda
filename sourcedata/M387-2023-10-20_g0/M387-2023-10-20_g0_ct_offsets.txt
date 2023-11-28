@@ -1,0 +1,4 @@
+smp_imap0:	0
+smp_nidq:	0
+sec_imap0:	0.000000
+sec_nidq:	0.000000
