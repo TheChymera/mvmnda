@@ -1,0 +1,14 @@
+ExpKeys.subject = "M388";
+ExpKeys.species =  "mouse";
+ExpKeys.genetics = "PV-Cre:Ai-32"
+ExpKeys.sex = "Female";
+ExpKeys.probeDepth = 3.28; % in mm
+ExpKeys.DOB = "2022-04-22";
+ExpKeys.experimenter = "Kyoko";
+ExpKeys.hemisphere =  "Left";
+ExpKeys.date = "2023-11-20"
+ExpKeys.insertion_AP = -2; % in mm, relative to bregma
+ExpKeys.insertion_ML = -1.5; % in mm, relative to bregma
+ExpKeys.insertion_pitch = 90; % pinpoint convention
+ExpKeys.insertion_yaw = 0; % pinpoint convention
+ExpKeys.insertion_roll = 0; % pinpoint convention
