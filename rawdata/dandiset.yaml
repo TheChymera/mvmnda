@@ -20,7 +20,7 @@ contributor:
   - dcite:ContactPerson
   schemaKey: Person
 dateCreated: '2024-01-25T15:57:58.990029+00:00'
-datePublished: '2024-01-25T15:58:34.008145+00:00'
+datePublished: '2024-01-25T19:14:34.109394+00:00'
 description: Neuropixels SpikeGLX data for olfaction.
 doi: 10.80507/dandi.123456/0.123456.1234
 id: DANDI:000876/draft
@@ -31,13 +31,13 @@ manifestLocation:
 - https://api.dandiarchive.org/api/dandisets/000876/versions/draft/assets/
 name: MVMNDA
 publishedBy:
-  endDate: '2024-01-25T15:58:34.008145+00:00'
-  id: urn:uuid:1d0ab10e-bbc8-4059-9d81-4cce2184f32d
+  endDate: '2024-01-25T19:14:34.109394+00:00'
+  id: urn:uuid:ea6c99fd-4420-4cf5-9549-90c09e4fd695
   name: DANDI publish
   schemaKey: PublishActivity
-  startDate: '2024-01-25T15:58:34.008145+00:00'
+  startDate: '2024-01-25T19:14:34.109394+00:00'
   wasAssociatedWith:
-  - id: urn:uuid:14761d69-7aca-4a41-83f8-be522a85fa00
+  - id: urn:uuid:91fe7aa0-c0df-440e-88f5-c715e161da66
     identifier: RRID:SCR_017571
     name: DANDI API
     schemaKey: Software
