@@ -12,9 +12,16 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
+
+try:
+    scratch_path = os.environ['MVMNDA_RAWDATA_SCRATCH_PATH']
+except KeyError:
+    scratch_path = "~/.local/share/mvmnda/rawdata/"
+    scratch_path = os.path.join(scratch_path, "{datetime.datetime.now().isoformat()}")
+scratch_path = os.path.abspath(os.path.expanduser(scratch_path))
+os.makedirs(scratch_path, exist_ok=True)
+
 dir_path = "../../sourcedata/sub-M388/M388-2023-11-20_2_g0"
-#dir_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/sub-pixelfiber/M387-2023-10-20_g0"
-#dir_path = "../../sourcedata/M387-2023-10-20_g0"
 converter = SpikeGLXConverterPipe(folder_path=dir_path)
 
 m = re.match(".*?sub-(?P<subject>[a-zA-z0-9]+).*?","../../sourcedata/sub-M388/M388-2023-11-20_2_g0")
@@ -53,7 +60,5 @@ metadata["NWBFile"].update(session_id=session)
 ##nwbfile_path = "/mnt/DATA/data/studies/manish/mvmnda/rawdata/my_spikeglx_session.nwb"
 ##converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
 
-
-
-nwbfile_path = "../nwbdata/outfile.nwb"
+nwbfile_path = os.path.join(scratch_path,f"ses-{metadata['NWBFile']['session_id']}_sub-{metadata['Subject']['subject_id']}.nwb")
 converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)

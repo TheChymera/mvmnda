@@ -9,17 +9,14 @@ IMAGE_TAG=0.0.1
 
 FQDN_IMAGE=${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}
 
-# PATH for scratch directory storing intermidiate results etc;
-# By default -- all data including intermediate results are under this folder (YODA!)
-#ifeq ($(SCRATCH_PATH),)
-#	SCRATCH_PATH = /var/tmp/mvmnda/
-#endif
-
 OCI_BINARY?=podman
+PACKAGE_NAME=mvmnda
 RELEASE_VERSION?=9999
 RESOLUTION?=9999 # specified in microns
+SCRATCH_PATH?=~/.local/share/mvmnda/rawdata/
 SING_BINARY?=singularity
-PACKAGE_NAME=mvmnda
+
+OUT_PATH=$(PWD)/../
 
 DISTFILE_CACHE_CMD :=
 
@@ -36,12 +33,22 @@ else
     DISTFILE_CACHE_CMD =-v $(DISTFILE_CACHE_PATH):/var/cache/distfiles
 endif
 
+.PHONY: nwb
+nwb:
+	MVMNDA_RAWDATA_SCRATCH_PATH="${SCRATCH_PATH}/$$(date +"%Y-%m-%dT%H:%M:%S%z")" python reposit.py
+
+
+.PHONY: bids
+bids:
+	cd ${SCRATCH_PATH}; dandi organize -d ${OUT_PATH} .
+
+
 .PHONY: data
-data: clean
-	python reposit.py
+data: nwb bids
+
 
 .PHONY: data-oci
-data-oci: clean
+data-oci:
 	$(OCI_BINARY) run \
 		-it \
 		--rm \
@@ -51,7 +58,7 @@ data-oci: clean
 		make data
 
 .PHONY: data-oci-interactive
-data-oci-interactive: clean
+data-oci-interactive:
 	$(OCI_BINARY) run \
 		-it \
 		--rm \
@@ -61,31 +68,17 @@ data-oci-interactive: clean
 		/bin/bash
 
 
-
-# Build data analysis container
-#.PHONY: oci-image-debug
-#oci-image:
-#	$(OCI_BINARY) build . $(DISTFILE_CACHE_CMD) \
-#		-it \
-#		-f Containerfile \
-#		-t ${FQDN_IMAGE}
-
-# Build data analysis container
 .PHONY: oci-image
 oci-image:
 	$(OCI_BINARY) build . $(DISTFILE_CACHE_CMD) \
 		-f Containerfile \
 		-t ${FQDN_IMAGE}
 
-# Push containers
 .PHONY: oci-push
 oci-push:
 	$(OCI_BINARY) push ${FQDN_IMAGE}
 
-# Push containers
+
 .PHONY: clean
 clean:
-	@rm -rf ABI-connectivity-data*
-
-
-
+	rm -rf ${SCRATCH_PATH}
