@@ -6,6 +6,11 @@ import json
 import re
 import pynwb
 import datetime
+import os
+
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
 
 dir_path = "../../sourcedata/sub-M388/M388-2023-11-20_2_g0"
 #dir_path = "/mnt/DATA/data/studies/manish/mvmnda/sourcedata/sub-pixelfiber/M387-2023-10-20_g0"
@@ -24,7 +29,7 @@ session_start_time = metadata["NWBFile"]["session_start_time"].replace(tzinfo=tz
 metadata["NWBFile"].update(session_start_time=session_start_time)
 session = (metadata["NWBFile"]["session_start_time"]).strftime("%Y%m%d%H%M%S")
 
-print(session)
+#print(session)
 
 # Maybe do data of birth rather than age
 metadata["Subject"] = dict(
@@ -35,11 +40,11 @@ metadata["Subject"] = dict(
     #date_of_birth=session_start_time-age_delta,
 )
 # No idea why this needs to be done via `.update()`
-#metadata["NWBFile"].update(session_id=session)
+metadata["NWBFile"].update(session_id=session)
 #metadata["session_id"] = session
-metadata["NWBFile"] = dict(session_id=session)
+#metadata["NWBFile"] = dict(session_id=session)
 
-print(metadata)
+#print(metadata)
 
 #print(metadata)
 #print(metadata["NWBFile"])
@@ -50,5 +55,5 @@ print(metadata)
 
 
 
-nwbfile_path = "../_examplefile.nwb"
+nwbfile_path = "../nwbdata/outfile.nwb"
 converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
