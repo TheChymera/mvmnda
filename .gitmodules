@@ -1,0 +1,6 @@
+[submodule "rawdata/code/dandi-cli"]
+	path = rawdata/code/dandi-cli
+	url = https://github.com/dandi/dandi-cli.git
+[submodule "rawdata/code/python-neo"]
+	path = rawdata/code/python-neo
+	url = https://github.com/NeuralEnsemble/python-neo.git

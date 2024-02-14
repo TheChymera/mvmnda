@@ -1,0 +1,8 @@
+# Required by DANDI:
+Subject
+
+# Required by Manish:
+Date/Session — merged, sourced from metadata `...createtime...`
+Sex — sidecar
+Strain/genotype — sidecar
+Species
