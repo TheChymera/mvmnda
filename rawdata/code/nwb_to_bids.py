@@ -16,7 +16,6 @@ def extract_metadata(filepath: str) -> dict:
 
         probes = set([x.device for x in nwbfile.electrodes["group"][:]])
 
-
         ess = [
             x for x in nwbfile.objects.values()
             if isinstance(x, ElectricalSeries)
