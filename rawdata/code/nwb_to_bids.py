@@ -7,6 +7,15 @@ import pandas as pd
 import shutil
 
 
+
+def nwb2bids(in_dir, out_dir):
+   for nwb_file in os.listdir(in_dir):
+      if not nwb_file[-4:] in ["NWB", "nwb"]:
+         continue
+      else:
+         metadata = extract_metadata(nwb_file)
+
+
 def extract_metadata(filepath: str) -> dict:
 
     with NWBHDF5IO(filepath, load_namespaces=True) as io:

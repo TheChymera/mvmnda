@@ -15,6 +15,7 @@ RELEASE_VERSION?=9999
 RESOLUTION?=9999 # specified in microns
 SCRATCH_PATH?=~/.local/share/mvmnda/rawdata/
 SING_BINARY?=singularity
+MVMNDA_RAWDATA_SCRATCH_PATH?=$(SCRATCH_PATH)/$$(date +"%Y-%m-%dT%H:%M:%S%z")
 
 OUT_PATH=$(PWD)/../
 
@@ -35,16 +36,20 @@ endif
 
 .PHONY: nwb
 nwb:
-	MVMNDA_RAWDATA_SCRATCH_PATH="${SCRATCH_PATH}/$$(date +"%Y-%m-%dT%H:%M:%S%z")" python reposit.py
+	python reposit.py
+
+
+.PHONY: bids-dandi
+bids-dandi:
+	cd ${MVMNDA_RAWDATA_SCRATCH_PATH}; dandi organize -d ${OUT_PATH} .
 
 
 .PHONY: bids
 bids:
-	cd ${SCRATCH_PATH}; dandi organize -d ${OUT_PATH} .
-
+	python -c "import nwb_to_bids; nwb_to_bids.nwb2bids(\"${MVMNDA_RAWDATA_SCRATCH_PATH}\", \"${OUT_PATH}\")"
 
 .PHONY: data
-data: nwb bids
+data: nwb
 
 
 .PHONY: data-oci

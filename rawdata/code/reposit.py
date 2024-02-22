@@ -2,6 +2,7 @@ from datetime import datetime
 from dateutil import tz
 from pathlib import Path
 from neuroconv.converters import SpikeGLXConverterPipe
+import glob
 import json
 import re
 import pynwb
@@ -71,7 +72,7 @@ def read_expkeys(
             'LFP_channels',
             'ref_channels',
     ]
-    
+
     p1 = re.compile('ExpKeys.(.+?)=')
     p2 = ['=(.+?)";', '=(.+?)};', '=(.+?)];', '=(.+?);']  # The order is important
     p2 = [re.compile(x) for x in p2]
@@ -118,14 +119,23 @@ try:
     scratch_path = os.environ['MVMNDA_RAWDATA_SCRATCH_PATH']
 except KeyError:
     scratch_path = "~/.local/share/mvmnda/rawdata/"
-    scratch_path = os.path.join(scratch_path, "{datetime.datetime.now().isoformat()}")
+    scratch_path = os.path.join(scratch_path, f"{datetime.datetime.now().isoformat()}")
 scratch_path = os.path.abspath(os.path.expanduser(scratch_path))
 os.makedirs(scratch_path, exist_ok=True)
 
 dir_path = "../../sourcedata/sub-M388/M388-2023-11-20_2_g0"
+
+exp_metadata_file = glob.glob(os.path.join(dir_path,"*.m"))
+if len(exp_metadata_file) == 1:
+    exp_metadata_file = exp_metadata_file[0]
+else:
+    raise ValueError("There should only be one ExpKeys file per experiment.")
+
+expkeys = read_expkeys(exp_metadata_file)
+
 converter = SpikeGLXConverterPipe(folder_path=dir_path)
 
-m = re.match(".*?sub-(?P<subject>[a-zA-z0-9]+).*?","../../sourcedata/sub-M388/M388-2023-11-20_2_g0")
+m = re.match(".*?sub-(?P<subject>[a-zA-z0-9]+).*?",dir_path)
 # add logic to fall back on expkeys
 
 subject = m.groupdict()["subject"]
