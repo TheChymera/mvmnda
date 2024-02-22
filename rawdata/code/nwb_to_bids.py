@@ -90,7 +90,7 @@ def drop_false_cols(df):
 path = "../"
 #path = "/Volumes/Extreme Pro/neural_data/dandisets/000044"
 
-nwb_files = glob(path + "/sub-*/*.nwb")
+nwb_files = glob(path + "/sub-*/ses-*/*.nwb")
 
 all_metadata = {x: extract_metadata(x) for x in nwb_files}
 
