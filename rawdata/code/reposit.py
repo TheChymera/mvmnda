@@ -116,10 +116,9 @@ def read_expkeys(
 
 
 try:
-    scratch_path = os.environ['MVMNDA_RAWDATA_SCRATCH_PATH']
+    scratch_path = os.environ['SCRATCH_PATH']
 except KeyError:
     scratch_path = "~/.local/share/mvmnda/rawdata/"
-    scratch_path = os.path.join(scratch_path, f"{datetime.datetime.now().isoformat()}")
 scratch_path = os.path.abspath(os.path.expanduser(scratch_path))
 os.makedirs(scratch_path, exist_ok=True)
 
