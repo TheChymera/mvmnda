@@ -119,10 +119,10 @@ def nwb2bids(in_dir, out_dir):
            drop_false_cols(df)
            df.to_csv(os.path.join(out_dir, subject_id, session_id, "ephys", var + ".tsv"), sep="\t", index=False)
 
+   # Ephys might need to be dynamically selected, nwb can also be ieeg.
    for nwb_file in nwb_files:
-       nwb_file_bids_path = f"{out_dir}/{metadata['subject']['subject_id']}/{metadata['session']['session_id']}/ephys/{metadata['subject']['subject_id']}_{metadata['session']['session_id']}.nwb"
-       print(nwb_file_bids_path)
-       shutil.copyfile(nwb_file, nwb_file_bids_path)
+       bids_path = f"{out_dir}/{metadata['subject']['subject_id']}/{metadata['session']['session_id']}/ephys/{metadata['subject']['subject_id']}_{metadata['session']['session_id']}_ephys.nwb"
+       shutil.copyfile(nwb_file, bids_path)
 
 
 

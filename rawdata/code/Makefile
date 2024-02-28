@@ -14,8 +14,7 @@ PACKAGE_NAME=mvmnda
 RELEASE_VERSION?=9999
 RESOLUTION?=9999 # specified in microns
 SCRATCH_PATH?=~/.local/share/mvmnda/nwbdata/
-SING_BINARY?=singularity
-#MVMNDA_RAWDATA_SCRATCH_PATH?=$(SCRATCH_PATH)/$$(date +"%Y-%m-%dT%H:%M:%S%z")
+IN_DIR?=../../sourcedata/
 
 OUT_PATH=$(PWD)/../
 
@@ -36,7 +35,7 @@ endif
 
 .PHONY: nwb
 nwb:
-	python reposit.py
+	SCRATCH_PATH=${SCRATCH_PATH} python -c "import reposit; reposit.convert_all(\"${IN_DIR}\")"
 
 
 .PHONY: bids-dandi

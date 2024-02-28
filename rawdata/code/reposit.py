@@ -9,9 +9,18 @@ import pynwb
 import datetime
 import os
 
-abspath = os.path.abspath(__file__)
-dname = os.path.dirname(abspath)
-os.chdir(dname)
+ABSPATH = os.path.abspath(__file__)
+THIS_DIR = os.path.dirname(ABSPATH)
+os.chdir(THIS_DIR)
+
+EXPKEY_PATTERN="*_keys.m"
+
+try:
+    SCRATCH_PATH = os.environ['SCRATCH_PATH']
+except KeyError:
+    SCRATCH_PATH = "~/.local/share/mvmnda/nwbdata/"
+SCRATCH_PATH = os.path.abspath(os.path.expanduser(SCRATCH_PATH))
+os.makedirs(SCRATCH_PATH, exist_ok=True)
 
 def read_expkeys(
     in_file,
@@ -71,6 +80,7 @@ def read_expkeys(
             'hasSpecialStim',
             'LFP_channels',
             'ref_channels',
+            'DOB',
     ]
 
     p1 = re.compile('ExpKeys.(.+?)=')
@@ -114,64 +124,74 @@ def read_expkeys(
         #print(json.dumps(out_dict))
         return out_dict
 
-
-try:
-    scratch_path = os.environ['SCRATCH_PATH']
-except KeyError:
-    scratch_path = "~/.local/share/mvmnda/rawdata/"
-scratch_path = os.path.abspath(os.path.expanduser(scratch_path))
-os.makedirs(scratch_path, exist_ok=True)
-
-dir_path = "../../sourcedata/sub-M388/M388-2023-11-20_2_g0"
-
-exp_metadata_file = glob.glob(os.path.join(dir_path,"*.m"))
-if len(exp_metadata_file) == 1:
-    exp_metadata_file = exp_metadata_file[0]
-else:
-    raise ValueError("There should only be one ExpKeys file per experiment.")
-
-expkeys = read_expkeys(exp_metadata_file)
-
-converter = SpikeGLXConverterPipe(folder_path=dir_path)
-
-m = re.match(".*?sub-(?P<subject>[a-zA-z0-9]+).*?",dir_path)
-# add logic to fall back on expkeys
-
-subject = m.groupdict()["subject"]
-
-# Extract what metadata we can from the source files
-metadata = converter.get_metadata()
-
-# Set timezone
-session_start_time = metadata["NWBFile"]["session_start_time"].replace(tzinfo=tz.gettz("US/Eastern"))
-metadata["NWBFile"].update(session_start_time=session_start_time)
-session = (metadata["NWBFile"]["session_start_time"]).strftime("%Y%m%d%H%M%S")
-
-# Maybe do date of birth rather than age
-metadata["Subject"] = dict(
-    subject_id=subject,
-    sex="F",
-    species="Mus musculus",
-    age="P90D",
-    #date_of_birth=session_start_time-age_delta,
-)
-# No idea why this needs to be done via `.update()`
-metadata["NWBFile"].update(session_id=session)
-
-# Read in Matt's lab “keys” files.
+def get_expkeys_file(in_dir):
+    expkeys_files = glob.glob(os.path.join(in_dir,EXPKEY_PATTERN))
+    if len(expkeys_files) == 1:
+        return expkeys_files[0]
+    elif len(expkeys_files) >= 1:
+        print("There should only be one ExpKeys file per experiment.")
+        print(f"In the `{in_dir}` candidate directory the following ExpKeys pattern files were found:")
+        for expkeys_file in expkeys_files:
+            print(f"\t* `{expkeys_file}`")
+        return False
+    else:
+        print(f"No ExpKeys file found under `{in_dir}`.")
 
 
 
+def convert_all(base_dir):
+    in_dir = os.path.abspath(os.path.expanduser(base_dir))
 
+    # Is this a sensible criterion?
+    spikeglx_dirs = [y for x in os.walk(base_dir) for y in glob.glob(os.path.join(x[0], '*_g0'))]
+    for spikeglx_dir in spikeglx_dirs:
+        # Only convert if we have ExpKeys
+        if get_expkeys_file(spikeglx_dir):
+            convert_measurement(spikeglx_dir)
 
-#print(metadata)
+def convert_measurement(in_dir, scratch_path=SCRATCH_PATH):
+    expkeys_file = get_expkeys_file(in_dir)
+    if not expkeys_file:
+        raise ValueError("Cannot proceed without corresponding ExpKeys file.")
 
-#print(metadata)
-#print(metadata["NWBFile"])
-#
-# Choose a path for saving the nwb file and run the conversion
-##nwbfile_path = "/mnt/DATA/data/studies/manish/mvmnda/rawdata/my_spikeglx_session.nwb"
-##converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
+    expkeys = read_expkeys(expkeys_file)
 
-nwbfile_path = os.path.join(scratch_path,f"ses-{metadata['NWBFile']['session_id']}_sub-{metadata['Subject']['subject_id']}.nwb")
-converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
+    converter = SpikeGLXConverterPipe(folder_path=in_dir)
+
+    m = re.match(".*?sub-(?P<subject>[a-zA-z0-9]+).*?", in_dir)
+    # add logic to fall back on expkeys
+
+    subject = m.groupdict()["subject"]
+
+    # Extract what metadata we can from the source files
+    metadata = converter.get_metadata()
+
+    # Set timezone
+    session_start_time = metadata["NWBFile"]["session_start_time"].replace(tzinfo=tz.gettz("US/Eastern"))
+    metadata["NWBFile"].update(session_start_time=session_start_time)
+    session = (metadata["NWBFile"]["session_start_time"]).strftime("%Y%m%d%H%M%S")
+
+    # Maybe do date of birth rather than age
+    metadata["Subject"] = dict(
+        subject_id=subject,
+        sex="F",
+        species="Mus musculus",
+        age="P90D",
+        date_of_birth=expkeys["DOB"],
+    )
+    # No idea why this needs to be done via `.update()`
+    metadata["NWBFile"].update(session_id=session)
+
+    # Read in Matt's lab “keys” files.
+
+    #print(metadata)
+
+    #print(metadata)
+    #print(metadata["NWBFile"])
+    #
+    # Choose a path for saving the nwb file and run the conversion
+    ##nwbfile_path = "/mnt/DATA/data/studies/manish/mvmnda/rawdata/my_spikeglx_session.nwb"
+    ##converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
+
+    nwbfile_path = os.path.join(scratch_path,f"ses-{metadata['NWBFile']['session_id']}_sub-{metadata['Subject']['subject_id']}.nwb")
+    converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
