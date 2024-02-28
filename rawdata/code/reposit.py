@@ -6,7 +6,6 @@ import glob
 import json
 import re
 import pynwb
-import datetime
 import os
 
 ABSPATH = os.path.abspath(__file__)
@@ -154,6 +153,8 @@ def convert_measurement(in_dir, scratch_path=SCRATCH_PATH):
     if not expkeys_file:
         raise ValueError("Cannot proceed without corresponding ExpKeys file.")
 
+    print(f"Converting `{in_dir}` session directory to NWB.")
+
     expkeys = read_expkeys(expkeys_file)
 
     converter = SpikeGLXConverterPipe(folder_path=in_dir)
@@ -193,5 +194,7 @@ def convert_measurement(in_dir, scratch_path=SCRATCH_PATH):
     ##nwbfile_path = "/mnt/DATA/data/studies/manish/mvmnda/rawdata/my_spikeglx_session.nwb"
     ##converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
 
-    nwbfile_path = os.path.join(scratch_path,f"ses-{metadata['NWBFile']['session_id']}_sub-{metadata['Subject']['subject_id']}.nwb")
+    datestamp = datetime.now().isoformat()
+
+    nwbfile_path = os.path.join(scratch_path,f"ses-{metadata['NWBFile']['session_id']}_sub-{metadata['Subject']['subject_id']}_{datestamp}.nwb")
     converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
