@@ -2,6 +2,7 @@ from pynwb import NWBHDF5IO
 from pynwb.ecephys import ElectricalSeries
 from glob import glob
 import os
+import csv
 import json
 import pandas as pd
 import shutil
@@ -31,11 +32,12 @@ def nwb2bids(in_dir, out_dir):
    df = pd.DataFrame(subjects)
 
    drop_false_cols(df)
+   subjects = drop_false_keys(subjects)
 
-   df.to_csv(os.path.join(out_dir, "participants.tsv"), sep="\t", index=False)
+   subjects_file_path = os.path.join(out_dir, "participants.tsv")
+   write_tsv(subjects, subjects_file_path)
 
-
-   # create particiant json
+   # create particiants JSON
    default_subjects_json = {
        "subject_id": {"Description": "Unique identifier of the subject"},
        "species": {"Description": "The binomial species name from the NCBI Taxonomy"},
@@ -95,15 +97,29 @@ def nwb2bids(in_dir, out_dir):
                x["subject"]["subject_id"] == subject_id
            ]
 
+           sessions = drop_false_keys(sessions)
+
+           sessions_file_path = os.path.join(out_dir, subject_id, "sessions.tsv")
+           sessions_keys = write_tsv(sessions, sessions_file_path)
+
            df = pd.DataFrame(sessions)
            drop_false_cols(df)
+           #print(df)
+           #print(sessions)
 
-           df.to_csv(os.path.join(out_dir, subject_id, "sessions.tsv"), sep="\t", index=False)
+           print("---------------------")
+           print([k for k in df.columns])
+           sessions_json1 = {k: v for k, v in default_session_json.items() if k in df.columns}
+           print(sessions_json1)
+           print([k for k in sessions_keys])
+           sessions_json = {k: v for k, v in default_session_json.items() if k in sessions_keys}
+           print(sessions_json)
+           print("---------------------")
 
-           session_json = {k: v for k, v in default_session_json.items() if k in df.columns}
-
+           with open(os.path.join(out_dir, subject_id, "sessions1.json"), "w") as json_file:
+               json.dump(sessions_json1, json_file, indent=4)
            with open(os.path.join(out_dir, subject_id, "sessions.json"), "w") as json_file:
-               json.dump(session_json, json_file, indent=4)
+               json.dump(sessions_json, json_file, indent=4)
 
    # contacts, probes, and channels
 
@@ -116,9 +132,14 @@ def nwb2bids(in_dir, out_dir):
        os.makedirs(os.path.join(out_dir, subject_id, session_id, "ephys"), exist_ok=True)
 
        for var in ("contacts", "probes", "channels"):
+           var_metadata = metadata[var]
+           var_metadata = drop_false_keys(var_metadata)
+           var_metadata_file_path = os.path.join(out_dir, subject_id, session_id, "ephys", var + ".tsv")
+           write_tsv(var_metadata, var_metadata_file_path)
+
            df = pd.DataFrame(metadata[var])
            drop_false_cols(df)
-           df.to_csv(os.path.join(out_dir, subject_id, session_id, "ephys", var + ".tsv"), sep="\t", index=False)
+           df.to_csv(os.path.join(out_dir, subject_id, session_id, "ephys", var + "1.tsv"), sep="\t", index=False)
 
        bids_path = f"{out_dir}/{metadata['subject']['subject_id']}/{metadata['session']['session_id']}/ephys/{metadata['subject']['subject_id']}_{metadata['session']['session_id']}_ephys.nwb"
        shutil.copyfile(nwb_file, bids_path)
@@ -201,7 +222,31 @@ def drop_false_cols(df):
         if not any(df[col][:]):
             df.drop(columns=[col], inplace=True)
 
+def drop_false_keys(list_of_dict):
+   list_of_dict = [{k: v for k, v in d.items() if v} for d in list_of_dict]
+   return list_of_dict
 
+
+def write_tsv(list_of_dict, file_path):
+   """
+   Write a list of dictionaries to a tsv file using all keys as colums.
+
+   Notes
+   -----
+   1. The order of columns should maybe be tweaked.
+   """
+
+   keys = set().union(*(d.keys() for d in list_of_dict))
+   with open(file_path, "w") as f:
+      dict_writer = csv.DictWriter(
+            f,
+            keys,
+            delimiter='\t',
+            )
+      dict_writer.writeheader()
+      dict_writer.writerows(list_of_dict)
+
+   return keys
 
 
 
