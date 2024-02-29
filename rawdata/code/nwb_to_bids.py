@@ -112,6 +112,7 @@ def nwb2bids(in_dir, out_dir):
        subject_id = metadata["subject"]["subject_id"]
 
        os.makedirs(os.path.join(out_dir, subject_id, session_id), exist_ok=True)
+      # Ephys might need to be dynamically selected, nwb can also be ieeg.
        os.makedirs(os.path.join(out_dir, subject_id, session_id, "ephys"), exist_ok=True)
 
        for var in ("contacts", "probes", "channels"):
@@ -119,8 +120,6 @@ def nwb2bids(in_dir, out_dir):
            drop_false_cols(df)
            df.to_csv(os.path.join(out_dir, subject_id, session_id, "ephys", var + ".tsv"), sep="\t", index=False)
 
-   # Ephys might need to be dynamically selected, nwb can also be ieeg.
-   for nwb_file in nwb_files:
        bids_path = f"{out_dir}/{metadata['subject']['subject_id']}/{metadata['session']['session_id']}/ephys/{metadata['subject']['subject_id']}_{metadata['session']['session_id']}_ephys.nwb"
        shutil.copyfile(nwb_file, bids_path)
 
