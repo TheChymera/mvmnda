@@ -4,7 +4,6 @@ from glob import glob
 import os
 import csv
 import json
-import pandas as pd
 import shutil
 
 def nwb2bids(in_dir, out_dir):
@@ -29,13 +28,10 @@ def nwb2bids(in_dir, out_dir):
        [x["subject"] for x in all_metadata.values()]
    )
 
-   df = pd.DataFrame(subjects)
-
-   drop_false_cols(df)
    subjects = drop_false_keys(subjects)
 
    subjects_file_path = os.path.join(out_dir, "participants.tsv")
-   write_tsv(subjects, subjects_file_path)
+   subjects_keys = write_tsv(subjects, subjects_file_path)
 
    # create particiants JSON
    default_subjects_json = {
@@ -47,8 +43,7 @@ def nwb2bids(in_dir, out_dir):
        "sex": {"Description": "Sex of participant"},
    }
 
-   subjects_json = {k: v for k, v in default_subjects_json.items() if k in df.columns}
-
+   subjects_json = {k: v for k, v in default_subjects_json.items() if k in subjects_keys}
    with open(os.path.join(out_dir, "participants.json"), "w") as json_file:
        json.dump(subjects_json, json_file, indent=4)
 
@@ -101,23 +96,8 @@ def nwb2bids(in_dir, out_dir):
 
            sessions_file_path = os.path.join(out_dir, subject_id, "sessions.tsv")
            sessions_keys = write_tsv(sessions, sessions_file_path)
-
-           df = pd.DataFrame(sessions)
-           drop_false_cols(df)
-           #print(df)
-           #print(sessions)
-
-           print("---------------------")
-           print([k for k in df.columns])
-           sessions_json1 = {k: v for k, v in default_session_json.items() if k in df.columns}
-           print(sessions_json1)
-           print([k for k in sessions_keys])
            sessions_json = {k: v for k, v in default_session_json.items() if k in sessions_keys}
-           print(sessions_json)
-           print("---------------------")
 
-           with open(os.path.join(out_dir, subject_id, "sessions1.json"), "w") as json_file:
-               json.dump(sessions_json1, json_file, indent=4)
            with open(os.path.join(out_dir, subject_id, "sessions.json"), "w") as json_file:
                json.dump(sessions_json, json_file, indent=4)
 
@@ -136,10 +116,6 @@ def nwb2bids(in_dir, out_dir):
            var_metadata = drop_false_keys(var_metadata)
            var_metadata_file_path = os.path.join(out_dir, subject_id, session_id, "ephys", var + ".tsv")
            write_tsv(var_metadata, var_metadata_file_path)
-
-           df = pd.DataFrame(metadata[var])
-           drop_false_cols(df)
-           df.to_csv(os.path.join(out_dir, subject_id, session_id, "ephys", var + "1.tsv"), sep="\t", index=False)
 
        bids_path = f"{out_dir}/{metadata['subject']['subject_id']}/{metadata['session']['session_id']}/ephys/{metadata['subject']['subject_id']}_{metadata['session']['session_id']}_ephys.nwb"
        shutil.copyfile(nwb_file, bids_path)
@@ -216,11 +192,6 @@ def unique_list_of_dicts(data):
     unique_list_of_dicts = [dict(t) for t in unique_data]
     return unique_list_of_dicts
 
-
-def drop_false_cols(df):
-    for col in df.columns:
-        if not any(df[col][:]):
-            df.drop(columns=[col], inplace=True)
 
 def drop_false_keys(list_of_dict):
    list_of_dict = [{k: v for k, v in d.items() if v} for d in list_of_dict]
