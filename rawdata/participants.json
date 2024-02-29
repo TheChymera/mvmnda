@@ -1,0 +1,15 @@
+{
+    "subject_id": {
+        "Description": "Unique identifier of the subject"
+    },
+    "species": {
+        "Description": "The binomial species name from the NCBI Taxonomy"
+    },
+    "age": {
+        "Description": "Age of the participant at time of recording",
+        "Units": "days"
+    },
+    "sex": {
+        "Description": "Sex of participant"
+    }
+}
