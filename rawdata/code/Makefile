@@ -45,7 +45,7 @@ bids-dandi:
 
 .PHONY: bids
 bids:
-	python -c "import nwb_to_bids; nwb_to_bids.nwb2bids(\"${SCRATCH_PATH}\", \"${OUT_PATH}\")"
+	python -c "from nwb2bids import reformat; reformat.reformat_all(\"${SCRATCH_PATH}\", \"${OUT_PATH}\")"
 
 .PHONY: data
 data: nwb
