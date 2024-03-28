@@ -1,5 +1,5 @@
-FROM docker.io/gentoo/portage:20240118 as portage
-FROM docker.io/gentoo/stage3:20240115
+FROM docker.io/gentoo/portage:20240324 as portage
+FROM docker.io/gentoo/stage3:20240318
 
 # copy the entire portage volume in
 COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo
@@ -8,8 +8,8 @@ RUN emerge -v --noreplace dev-vcs/git
 RUN emerge -v1u portage
 
 # Pinned commits for the dependency tree state
-ARG gentoo_hash=3519e6c712f26cb361f43dc74bd96b27c6d04cac
-ARG science_hash=f9f093aa8035bb4656c98d054e00b5159e059153
+ARG gentoo_hash=776fd281e8a158bce2ea3f4845d4cfd848bc2dc5
+ARG science_hash=0e024beadac3ccaefb4a3961214eb74ee5853cf2
 ARG FEATURES="-ipc-sandbox -network-sandbox -pid-sandbox"
 
 # This will be bound, and contents available outside of container
