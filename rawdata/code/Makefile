@@ -5,7 +5,7 @@ REGISTRY=docker.io
 REPOSITORY=centerforopenneuroscience
 
 IMAGE_NAME=mvmnda
-IMAGE_TAG=0.0.1
+IMAGE_TAG=0.0.2
 
 FQDN_IMAGE=${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}
 
