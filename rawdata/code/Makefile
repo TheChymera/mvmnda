@@ -7,7 +7,7 @@ REPOSITORY=centerforopenneuroscience
 IMAGE_NAME=mvmnda
 IMAGE_TAG=0.0.2
 
-FQDN_IMAGE=${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}
+FQDN_IMAGE=${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}
 
 OCI_BINARY?=podman
 PACKAGE_NAME=mvmnda
@@ -51,6 +51,16 @@ bids:
 data: nwb
 
 
+.PHONY: data-singularity
+data-singularity:
+	cd ../../
+	singularity run --cleanenv --no-home -W $$PWD -B $$PWD:$$PWD .datalad/environments/mvmnda/image make -C rawdata/code/ data
+
+# DISCLAIMER: not tested.  Needs 
+update-singularity:
+	cd ../../
+	datalad containers-add --url docker://centerforopenneuroscience/mvmnda:??? --update mvmnda 
+
 .PHONY: data-oci
 data-oci:
 	$(OCI_BINARY) run \
@@ -76,11 +86,13 @@ data-oci-interactive:
 oci-image:
 	$(OCI_BINARY) build . $(DISTFILE_CACHE_CMD) \
 		-f Containerfile \
-		-t ${FQDN_IMAGE}
+		-t ${FQDN_IMAGE}:${IMAGE_TAG} \
+		-t ${FQDN_IMAGE}:latest
 
 .PHONY: oci-push
 oci-push:
-	$(OCI_BINARY) push ${FQDN_IMAGE}
+	$(OCI_BINARY) push ${FQDN_IMAGE}:${IMAGE_TAG} 
+	$(OCI_BINARY) push ${FQDN_IMAGE}:latest
 
 
 .PHONY: clean
