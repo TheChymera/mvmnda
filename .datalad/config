@@ -1,2 +1,5 @@
 [datalad "dataset"]
 	id = 5cd66ebd-28f4-439c-955a-e2545f2e67c8
+[datalad "containers.mvmnda"]
+	image = .datalad/environments/mvmnda/image
+	cmdexec = singularity exec {img} {cmd}
