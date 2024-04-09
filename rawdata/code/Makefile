@@ -7,7 +7,7 @@ REPOSITORY=centerforopenneuroscience
 IMAGE_NAME=mvmnda
 
 # Allow changing this on invocation by setting the variable
-#IMAGE_TAG=0.0.2
+#IMAGE_TAG=0.0.3
 IMAGE_TAG=latest
 
 FQDN_IMAGE=${REGISTRY}/${REPOSITORY}/${IMAGE_NAME}

@@ -8,8 +8,8 @@ RUN emerge -v --noreplace dev-vcs/git
 RUN emerge -v1u portage
 
 # Pinned commits for the dependency tree state
-ARG gentoo_hash=776fd281e8a158bce2ea3f4845d4cfd848bc2dc5
-ARG science_hash=0e024beadac3ccaefb4a3961214eb74ee5853cf2
+ARG gentoo_hash=1890d689a91c1c480bbd817c19990db09946def4
+ARG science_hash=73916dd3680ffd92e5bd3d32b262e5d78c86a448
 ARG FEATURES="-ipc-sandbox -network-sandbox -pid-sandbox"
 
 # This will be bound, and contents available outside of container
@@ -22,11 +22,21 @@ COPY .gentoo/overlay/ /var/db/repos/local/
 RUN rm /var/db/repos/gentoo -rf
 
 # Disable auto-sync
-RUN sed -i /etc/portage/repos.conf/{gentoo,science} -e "s/sync-type *= *git/sync-type =/g"
+#RUN sed -i /etc/portage/repos.conf/{gentoo,science} -e "s/sync-type *= *git/sync-type =/g"
 
 # Cloning manually to prevent vdb update, pinning state via git
-RUN REPO_URL=$(grep "^sync-uri" /etc/portage/repos.conf/gentoo | sed -e "s/sync-uri *= *//g"); mkdir -p /var/db/repos/gentoo; pushd /var/db/repos/gentoo; git clone ${REPO_URL} .; git fetch origin $gentoo_hash; git checkout $gentoo_hash; rm .git -rf; popd
-RUN REPO_URL=$(grep "^sync-uri" /etc/portage/repos.conf/science | sed -e "s/sync-uri *= *//g"); mkdir -p /var/db/repos/science; pushd /var/db/repos/science; git clone ${REPO_URL} .; git fetch origin $science_hash; git checkout $science_hash; rm .git -rf; popd
+# Allegedly it's better to chain everything in one command, something with container layers 🤔
+RUN \
+        REPO_URL=$(grep "^sync-uri" /etc/portage/repos.conf/gentoo | sed -e "s/sync-uri *= *//g") && \
+        mkdir -p /var/db/repos/gentoo && pushd /var/db/repos/gentoo && git init . && \
+                git remote add origin ${REPO_URL} && \
+                git fetch --filter="blob:none" origin $gentoo_hash && \
+                git reset --hard $gentoo_hash && rm .git -rf && popd && \
+        REPO_URL=$(grep "^sync-uri" /etc/portage/repos.conf/science | sed -e "s/sync-uri *= *//g") && \
+        mkdir -p /var/db/repos/science && pushd /var/db/repos/science && git init . && \
+                git remote add origin ${REPO_URL} && \
+                git fetch --filter="blob:none" origin $science_hash && \
+                git reset --hard $science_hash && rm .git -rf && popd
 
 # Remove sync-uri for consistency
 RUN sed -i /etc/portage/repos.conf/{gentoo,science} -e "/sync-uri/d"
