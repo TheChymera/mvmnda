@@ -197,4 +197,5 @@ def convert_measurement(in_dir, scratch_path=SCRATCH_PATH):
     datestamp = datetime.now().isoformat()
 
     nwbfile_path = os.path.join(scratch_path,f"ses-{metadata['NWBFile']['session_id']}_sub-{metadata['Subject']['subject_id']}_{datestamp}.nwb")
+    print(f"Trying to write {nwbfile_path}.")
     converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
