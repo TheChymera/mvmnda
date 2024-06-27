@@ -1,2 +1,0 @@
-type	probe_id	manufacturer	description
-unknown	Neuropixel-Imec	Imec	"{""probe_type"": ""24"", ""probe_type_description"": ""NP2.0(4-shank)"", ""flex_part_number"": ""NPM_FLEX_0"", ""connected_base_station_part_number"": ""NP2_QBSC_00""}"

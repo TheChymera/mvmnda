@@ -198,4 +198,8 @@ def convert_measurement(in_dir, scratch_path=SCRATCH_PATH):
 
     nwbfile_path = os.path.join(scratch_path,f"ses-{metadata['NWBFile']['session_id']}_sub-{metadata['Subject']['subject_id']}_{datestamp}.nwb")
     print(f"Trying to write {nwbfile_path}.")
-    converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)
+    if "ses-20240201140343_sub-M465_2024-04-10T12:07:31.510923.nwb" in nwbfile_path:
+        print("	Skipping.")
+        pass
+    else:
+        converter.run_conversion(nwbfile_path=nwbfile_path, metadata=metadata)

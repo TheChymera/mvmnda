@@ -1,0 +1,3 @@
+[submodule "rawdata/code/nwb2bids"]
+	path = rawdata/code/nwb2bids
+	url = https://github.com/con/nwb2bids

@@ -38,6 +38,7 @@ endif
 
 .PHONY: nwb
 nwb:
+	mkdir -p ${SCRATCH_PATH}
 	SCRATCH_PATH=${SCRATCH_PATH} python -c "import reposit; reposit.convert_all(\"${IN_DIR}\")"
 
 
@@ -48,7 +49,13 @@ bids-dandi:
 
 .PHONY: bids
 bids:
-	python -c "from nwb2bids import reformat; reformat.reformat_all(\"${SCRATCH_PATH}\", \"${OUT_PATH}\")"
+	( \
+	cd nwb2bids; \
+	mkdir -p .venv; \
+	python -m venv .venv/; \
+	source .venv/bin/activate; pip install -e . ; \
+	python -c "from nwb2bids import reformat; reformat.reformat_all(\"${SCRATCH_PATH}\", \"${OUT_PATH}\")" ; \
+	)
 
 .PHONY: data
 data: nwb
@@ -70,6 +77,7 @@ data-oci:
 		-it \
 		--rm \
 		-v ${PWD}/../..:/root/src/mvmnda \
+		-v ~/.local/share/mvmnda/nwbdata/:~/.local/share/mvmnda/nwbdata/ \
 		--workdir /root/src/mvmnda/rawdata/code \
 		${FQDN_IMAGE}:${IMAGE_TAG} \
 		make data
@@ -80,6 +88,7 @@ data-oci-interactive:
 		-it \
 		--rm \
 		-v ${PWD}/../..:/root/src/mvmnda \
+		-v ~/.local/share/mvmnda/nwbdata/:/root/.local/share/mvmnda/nwbdata/ \
 		--workdir /root/src/mvmnda/rawdata/code \
 		${FQDN_IMAGE} \
 		/bin/bash
